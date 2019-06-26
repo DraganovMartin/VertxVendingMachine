@@ -31,112 +31,106 @@ public class DBVerticle extends AbstractVerticle {
         eventBus.consumer("machine.state", receivedMessage -> {
             JsonObject query = new JsonObject();
             query.put("_id", Machine.MACHINE_ID);
-           mongoClient.findOne("machine",query,null,res -> {
-               if (res.succeeded()){
-                   System.out.println(res.result());
-                   receivedMessage.reply(res.result());
-               }
-               else res.cause().printStackTrace();
-           });
+            mongoClient.findOne("machine", query, null, res -> {
+                if (res.succeeded()) {
+                    System.out.println(res.result());
+                    receivedMessage.reply(res.result());
+                } else res.cause().printStackTrace();
+            });
         });
 
         eventBus.consumer("create.insert", receivedMessage -> {
 //            System.out.println(receivedMessage.body());
             JsonObject machine = JsonObject.mapFrom(receivedMessage.body());
 
-            mongoClient.insert("machine",machine,res -> {
-               if (res.succeeded()){
-                   receivedMessage.reply(res.result());
-               }
-               else {
-                   res.cause().printStackTrace();
-               }
+            mongoClient.insert("machine", machine, res -> {
+                if (res.succeeded()) {
+                    receivedMessage.reply(res.result());
+                } else {
+                    res.cause().printStackTrace();
+                }
             });
         });
 
-        eventBus.consumer("updateMachine",receivedMessage ->{
-            JsonObject query = new JsonObject().put("_id",Machine.MACHINE_ID);
+        eventBus.consumer("updateMachine", receivedMessage -> {
+            JsonObject query = new JsonObject().put("_id", Machine.MACHINE_ID);
             JsonObject machine = (JsonObject) receivedMessage.body();
-            JsonObject update = new JsonObject().put("$set",new JsonObject()
-                    .put("beverages",machine.getJsonArray("beverages"))
+            JsonObject update = new JsonObject().put("$set", new JsonObject()
+                    .put("beverages", machine.getJsonArray("beverages"))
+                    .put("moneyAmount", machine.getDouble("moneyAmount"))
             );
 
-            mongoClient.updateCollection("machine",query,update,res ->{
-                if (res.succeeded()){
+            mongoClient.updateCollection("machine", query, update, res -> {
+                if (res.succeeded()) {
                     receivedMessage.reply("Updated");
-                }
-                else res.cause().printStackTrace();
+                } else res.cause().printStackTrace();
             });
         });
 
-        eventBus.consumer("beverages.all",handle -> {
+        eventBus.consumer("beverages.all", handle -> {
             JsonObject query = new JsonObject();
-            query.put("_id",Machine.MACHINE_ID);
-           mongoClient.findOne("machine",query,null,res ->{
-               if (res.succeeded()) {
+            query.put("_id", Machine.MACHINE_ID);
+            mongoClient.findOne("machine", query, null, res -> {
+                if (res.succeeded()) {
 //                   System.out.println(res.result());
 //                   Machine machine = res.result().mapTo(Machine.class);
-                   handle.reply(res.result().getJsonArray("beverages"));
-               }
-               else res.cause().printStackTrace();
-           });
+                    handle.reply(res.result().getJsonArray("beverages"));
+                } else res.cause().printStackTrace();
+            });
         });
 
-        eventBus.consumer("getBeverage",handle ->{
+        eventBus.consumer("getBeverage", handle -> {
             JsonObject query = new JsonObject();
-            query.put("_id",Machine.MACHINE_ID);
-            String bevType = (String) handle.body();
-           mongoClient.findOne("machine",query,null,res ->{
-              if (res.succeeded()){
-                  Machine machine = res.result().mapTo(Machine.class);
-                  System.out.println(machine);
-                  Beverage beverage = machine.getBeverages().stream().filter(beverage1 -> beverage1.getType().equals(bevType)).findFirst().orElse(null);
-                  handle.reply(Json.encodePrettily(beverage));
-              }
-              else res.cause().printStackTrace();
-           });
+            query.put("_id", Machine.MACHINE_ID);
+            Integer id = (Integer) handle.body();
+            mongoClient.findOne("machine", query, null, res -> {
+                if (res.succeeded()) {
+                    Machine machine = res.result().mapTo(Machine.class);
+                    System.out.println(machine);
+                    Beverage beverage = machine.getBeverages().stream().filter(beverage1 -> beverage1.getId() == id).findFirst().orElse(null);
+                    handle.reply(Json.encodePrettily(beverage));
+                } else res.cause().printStackTrace();
+            });
         });
 
-        eventBus.consumer("updateBeverage",handle ->{
-            JsonObject query = new JsonObject().put("_id",Machine.MACHINE_ID);
+        eventBus.consumer("updateBeverage", handle -> {
+            JsonObject query = new JsonObject().put("_id", Machine.MACHINE_ID);
             JsonObject machine = (JsonObject) handle.body();
-            JsonObject update = new JsonObject().put("$set",new JsonObject()
-                .put("beverages",machine.getJsonArray("beverages"))
+            JsonObject update = new JsonObject().put("$set", new JsonObject()
+                    .put("beverages", machine.getJsonArray("beverages"))
+                    .put("moneyAmount", machine.getDouble("moneyAmount"))
             );
-            mongoClient.updateCollection("machine",query,update,res ->{
-                if (res.succeeded()){
+            mongoClient.updateCollection("machine", query, update, res -> {
+                if (res.succeeded()) {
                     handle.reply("Updated");
-                }
-                else res.cause().printStackTrace();
+                } else res.cause().printStackTrace();
             });
         });
 
-        eventBus.consumer("deleteBeverage",handle ->{
+        eventBus.consumer("deleteBeverage", handle -> {
             JsonObject query = new JsonObject();
-            query.put("_id",Machine.MACHINE_ID);
+            query.put("_id", Machine.MACHINE_ID);
             JsonObject machine = (JsonObject) handle.body();
-            JsonObject update = new JsonObject().put("$set",new JsonObject()
-                    .put("beverages",machine.getJsonArray("beverages"))
+            JsonObject update = new JsonObject().put("$set", new JsonObject()
+                    .put("beverages", machine.getJsonArray("beverages"))
+                    .put("moneyAmount", machine.getDouble("moneyAmount"))
             );
-            mongoClient.updateCollection("machine",query,update,res ->{
-               if (res.succeeded()){
-                   handle.reply("Deleted");
-               }
-               else res.cause().printStackTrace();
+            mongoClient.updateCollection("machine", query, update, res -> {
+                if (res.succeeded()) {
+                    handle.reply("Deleted");
+                } else res.cause().printStackTrace();
             });
         });
 
-        eventBus.consumer("deleteMachine",handle->{
+        eventBus.consumer("deleteMachine", handle -> {
             JsonObject query = new JsonObject();
-            query.put("_id",Machine.MACHINE_ID);
-           mongoClient.removeDocument("machine",query,res->{
-              if (res.succeeded()){
-                  handle.reply("Deleted");
-              }
-              else res.cause().printStackTrace();
-           });
+            query.put("_id", Machine.MACHINE_ID);
+            mongoClient.removeDocument("machine", query, res -> {
+                if (res.succeeded()) {
+                    handle.reply("Deleted");
+                } else res.cause().printStackTrace();
+            });
         });
-
 
 
     }

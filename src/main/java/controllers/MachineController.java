@@ -51,21 +51,21 @@ public class MachineController {
     }
 
     public void getOne(RoutingContext routingContext) {
-        final String type = routingContext.request().getParam("id");
-        if (type == null) {
+        final String id = routingContext.request().getParam("id");
+        if (id == null) {
             routingContext.response().setStatusCode(400).end();
         } else {
-            machineService.getBeverage("getBeverage",type,routingContext);
+            machineService.getBeverage("getBeverage",id,routingContext);
         }
     }
 
     public void updateOne(RoutingContext routingContext) {
-        final String type = routingContext.request().getParam("id");
+        final String id = routingContext.request().getParam("id");
         JsonObject json = routingContext.getBodyAsJson();
         JsonArray jsonArray = new JsonArray();
-        jsonArray.add(type);
+        jsonArray.add(id);
         jsonArray.add(json);
-        if (type == null || json == null) {
+        if (id == null || json == null) {
             routingContext.response().setStatusCode(400).end();
         } else {
             machineService.updateBeverage("updateBeverage",jsonArray, routingContext);
@@ -73,11 +73,11 @@ public class MachineController {
     }
 
     public void deleteOne(RoutingContext routingContext) {
-        String type = routingContext.request().getParam("id");
-        if (type == null) {
+        String id = routingContext.request().getParam("id");
+        if (id == null) {
             routingContext.response().setStatusCode(400).end();
         } else {
-            machineService.deleteBeverage("deleteBeverage",type,routingContext);
+            machineService.deleteBeverage("deleteBeverage",id,routingContext);
         }
 
     }

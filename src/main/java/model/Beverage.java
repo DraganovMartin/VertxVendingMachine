@@ -4,8 +4,17 @@ import java.util.Objects;
 
 public class Beverage {
 
+    private int id;
     private String type;
     private double price;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getType() {
         return type;
