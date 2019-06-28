@@ -7,18 +7,18 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
-import services.MachineService;
+import services.MachineServiceImpl;
 
 
 public class MachineController {
     private Vertx vertx;
-    private MachineService machineService;
+    private MachineServiceImpl machineServiceImpl;
     private Router router;
     private EventBus eventBus;
 
     public MachineController(Vertx vertx) {
         this.vertx = vertx;
-        this.machineService = new MachineService(vertx);
+        this.machineServiceImpl = new MachineServiceImpl(vertx);
         this.router = Router.router(vertx);
         this.eventBus = vertx.eventBus();
         paths(router);
@@ -39,15 +39,15 @@ public class MachineController {
     }
 
     private void state(RoutingContext routingContext) {
-        machineService.getMachineStatus("machine.state",routingContext);
+        machineServiceImpl.getMachineStatus("machine.state",routingContext);
     }
 
     public void getAll(RoutingContext routingContext) {
-        machineService.getAllBeverages("beverages.all",routingContext);
+        machineServiceImpl.getAllBeverages("beverages.all",routingContext);
     }
 
     public void addOne(RoutingContext routingContext) {
-        machineService.addBeverage("create.insert",routingContext.getBodyAsJson(),routingContext);
+        machineServiceImpl.addBeverage("create.insert",routingContext.getBodyAsJson(),routingContext);
     }
 
     public void getOne(RoutingContext routingContext) {
@@ -55,7 +55,7 @@ public class MachineController {
         if (id == null) {
             routingContext.response().setStatusCode(400).end();
         } else {
-            machineService.getBeverage("getBeverage",id,routingContext);
+            machineServiceImpl.getBeverage("getBeverage",id,routingContext);
         }
     }
 
@@ -68,7 +68,7 @@ public class MachineController {
         if (id == null || json == null) {
             routingContext.response().setStatusCode(400).end();
         } else {
-            machineService.updateBeverage("updateBeverage",jsonArray, routingContext);
+            machineServiceImpl.updateBeverage("updateBeverage",jsonArray, routingContext);
         }
     }
 
@@ -77,7 +77,7 @@ public class MachineController {
         if (id == null) {
             routingContext.response().setStatusCode(400).end();
         } else {
-            machineService.deleteBeverage("deleteBeverage",id,routingContext);
+            machineServiceImpl.deleteBeverage("deleteBeverage",id,routingContext);
         }
 
     }

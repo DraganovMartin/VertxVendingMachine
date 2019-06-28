@@ -4,19 +4,14 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
-import io.vertx.ext.mongo.UpdateOptions;
 import model.Beverage;
 import model.Machine;
-import services.MachineService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class DBVerticle extends AbstractVerticle {
+
+    public static final String FAILED = "failed";
 
 
     @Override
@@ -47,6 +42,7 @@ public class DBVerticle extends AbstractVerticle {
                 if (res.succeeded()) {
                     receivedMessage.reply(res.result());
                 } else {
+                    receivedMessage.reply(new JsonObject().put(FAILED,FAILED));
                     res.cause().printStackTrace();
                 }
             });
@@ -63,7 +59,10 @@ public class DBVerticle extends AbstractVerticle {
             mongoClient.updateCollection("machine", query, update, res -> {
                 if (res.succeeded()) {
                     receivedMessage.reply("Updated");
-                } else res.cause().printStackTrace();
+                } else {
+                    receivedMessage.reply(new JsonObject().put(FAILED,FAILED));
+                    res.cause().printStackTrace();
+                }
             });
         });
 
@@ -75,7 +74,10 @@ public class DBVerticle extends AbstractVerticle {
 //                   System.out.println(res.result());
 //                   Machine machine = res.result().mapTo(Machine.class);
                     handle.reply(res.result().getJsonArray("beverages"));
-                } else res.cause().printStackTrace();
+                } else {
+                    handle.reply(new JsonObject().put(FAILED,FAILED));
+                    res.cause().printStackTrace();
+                }
             });
         });
 
@@ -89,7 +91,10 @@ public class DBVerticle extends AbstractVerticle {
                     System.out.println(machine);
                     Beverage beverage = machine.getBeverages().stream().filter(beverage1 -> beverage1.getId() == id).findFirst().orElse(null);
                     handle.reply(Json.encodePrettily(beverage));
-                } else res.cause().printStackTrace();
+                } else {
+                    handle.reply(new JsonObject().put(FAILED,FAILED));
+                    res.cause().printStackTrace();
+                }
             });
         });
 
@@ -103,7 +108,10 @@ public class DBVerticle extends AbstractVerticle {
             mongoClient.updateCollection("machine", query, update, res -> {
                 if (res.succeeded()) {
                     handle.reply("Updated");
-                } else res.cause().printStackTrace();
+                } else {
+                    handle.reply(new JsonObject().put(FAILED,FAILED));
+                    res.cause().printStackTrace();
+                }
             });
         });
 
@@ -118,7 +126,10 @@ public class DBVerticle extends AbstractVerticle {
             mongoClient.updateCollection("machine", query, update, res -> {
                 if (res.succeeded()) {
                     handle.reply("Deleted");
-                } else res.cause().printStackTrace();
+                } else {
+                    handle.reply(new JsonObject().put(FAILED,FAILED));
+                    res.cause().printStackTrace();
+                }
             });
         });
 
@@ -128,7 +139,10 @@ public class DBVerticle extends AbstractVerticle {
             mongoClient.removeDocument("machine", query, res -> {
                 if (res.succeeded()) {
                     handle.reply("Deleted");
-                } else res.cause().printStackTrace();
+                } else {
+                    handle.reply(new JsonObject().put(FAILED,FAILED));
+                    res.cause().printStackTrace();
+                }
             });
         });
 
